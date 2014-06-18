@@ -22,6 +22,14 @@ var rectangle = function(){
 
     }
 
+    this.getConnectionStartPoint = function(){
+        return new point(this.location.x + this.width, this.location.y + this.height/2);
+    }
+
+    this.getConnectionEndPoint = function(){
+        return new point(this.location.x, this.location.y + this.height/2);
+    }
+
     this.pointInMyArea = function(location){
 
         if(location.x >= this.location.x && location.x <= this.location.x + this.width &&

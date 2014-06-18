@@ -8,6 +8,7 @@ var painter = function(settings, context, canvas){
     this.canvas = canvas;
     this.settings = settings;
     this.graphics = [];
+    this.connections = [];
     var selectedGraphic = null;
 
     this.createGraphic = function(name, opts){
@@ -30,6 +31,7 @@ var painter = function(settings, context, canvas){
                 if(name == "connector"){
                     graphic = new connnector();
                     graphic.init(opts.source, opts.destination);
+                    this.connections.push(graphic);
                 }else{
 
                 }
@@ -122,6 +124,19 @@ var painter = function(settings, context, canvas){
         }
 
         return graphic;
+    }
+
+    this.checkExistingConnection = function(object1, object2){
+
+        for (var i = 0; i < this.connections.length; i++) {
+            var obj = this.connections[i];
+            if( (obj.source == object1 && obj.destination == object2 ) ||
+                (obj.source == object2 && obj.destination == object1 )){
+                return true;
+            }
+        }
+
+        return false;
     }
 
     this.selectGraphic = function(graphic){

@@ -22,22 +22,22 @@ var connnector = function(){
 
     this.paint = function(){
 
-        stroke = context.strokeStyle = "#768A8A";
+        var sourceStartPoint = this.source.getConnectionStartPoint();
+        var destinationEndPoint = this.destination.getConnectionEndPoint();
 
-        context.strokeStyle = "#768A8A";
+        context.strokeStyle = "rgb(255, 0, 0)";
+
         //Main Line
-        context.moveTo(this.source.location.x+this.source.width , this.source.location.y+this.source.height/2);
-        context.lineTo(this.destination.location.x, this.destination.location.y + this.destination.height/2);
+        context.moveTo(sourceStartPoint.x, sourceStartPoint.y);
+        context.lineTo(destinationEndPoint.x, destinationEndPoint.y);
 
-        context.lineTo(this.destination.location.x-10, this.destination.location.y + this.destination.height/2-10);
-        context.lineTo(this.destination.location.x, this.destination.location.y + this.destination.height/2);
+        context.moveTo(destinationEndPoint.x-10, destinationEndPoint.y-10);
+        context.lineTo(destinationEndPoint.x, destinationEndPoint.y);
 
-        context.lineTo(this.destination.location.x-10, this.destination.location.y + this.destination.height/2+10);
-        context.lineTo(this.destination.location.x, this.destination.location.y + this.destination.height/2);
+        context.moveTo(destinationEndPoint.x-10, destinationEndPoint.y+10);
+        context.lineTo(destinationEndPoint.x, destinationEndPoint.y);
 
         context.stroke();
-
-        context.strokeStyle = stroke;
     }
 
 }

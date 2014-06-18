@@ -162,6 +162,18 @@ function allowDrop(ev) {
 
 $(document).ready(function(){
 
+    $( "#dialogObjectsAlreadyConnected" ).dialog({
+        autoOpen: false,
+        show: {
+            effect: "blind",
+            duration: 1000
+        },
+        hide: {
+            effect: "explode",
+            duration: 1000
+        }
+    });
+
     canvas = document.getElementById('workAreaCanvas');
     context = canvas.getContext("2d");
 
@@ -311,6 +323,7 @@ $(document).ready(function(){
 
             if(processPainter.getSelectedGraphic() != null){
                 processPainter.moveSelectedGraphicTo(new point(e.pageX - this.offsetLeft, e.pageY - this.offsetTop));
+                showProperties(processPainter.getSelectedGraphic());
             }
         }
     });
@@ -331,7 +344,12 @@ $(document).ready(function(){
 
             if(ctrlPressed && selGraphic != null){
 
-                processPainter.createGraphic("connector", { source: selGraphic, destination: graphic });
+                //Connection done already?
+                if(processPainter.checkExistingConnection(graphic, selGraphic)){
+                    $( "#dialogObjectsAlreadyConnected" ).dialog( "open" );
+                }else{
+                    processPainter.createGraphic("connector", { source: selGraphic, destination: graphic });
+                }
 
             }else{
 
