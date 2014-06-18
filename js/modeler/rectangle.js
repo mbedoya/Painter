@@ -11,9 +11,26 @@ var rectangle = function(){
     }
 
     this.paint = function(){
+
         context.strokeStyle = "rgb(255, 0, 0)";
-        context.fillStyle = "rgba(255, 255, 0, .5)";
+        if(this.selected){
+            context.fillStyle = "rgba(255, 140, 0, .5)";
+        }else{
+            context.fillStyle = "rgba(255, 255, 0, .5)";
+        }
         roundRect(context, this.location.x, this.location.y, this.width, this.height, 10, true, true);
+
+    }
+
+    this.pointInMyArea = function(location){
+
+        if(location.x >= this.location.x && location.x <= this.location.x + this.width &&
+            location.y >= this.location.y && location.y <= this.location.y + this.height){
+
+            return true;
+        }else{
+            return false;
+        }
     }
 
     /**

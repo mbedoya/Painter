@@ -19,7 +19,13 @@
         <div style="width: 80%; height: 100%; float: left;border: solid 1px #FFF" ondrop="drop(event)" ondragover="allowDrop(event)">
             <img src="img/diagram.png">
             <canvas id="workAreaCanvas" ondrop="dropCanvas(event)" width="1024px" height="500px" style="border: solid 1px #CCC"></canvas>
+
+            <div id="canvasImage">
+
+            </div>
         </div>
+
+
         <div style="width: 18%; height: 100%; float: left;border: solid 1px #FFF" ondrop="drop(event)" ondragover="allowDrop(event)">
             <p><img src="img/properties.png"></p>
 
@@ -32,6 +38,8 @@
                 <a id="saveProperties" href="#"><img src="img/save.png"></a>
 
             </div>
+
+            <a id="getImage" href="#">Image</a>
 
         </div>
 
@@ -48,6 +56,7 @@
     <script src="js/modeler/rectangle.js"></script>
     <script src="js/modeler/circle.js"></script>
     <script src="js/modeler/painter.js"></script>
+    <script src="js/modeler/connector.js"></script>
 
 </body>
 </html>

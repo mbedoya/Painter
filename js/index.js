@@ -6,15 +6,13 @@ var lineStarted = false;
 var mouseX;
 var mouseY;
 
-var processModel;
-var canvas;
-
-var selectedActivity = null;
 var buttonPressed = false;
-
 var ctrlPressed = false;
 
 var context;
+var canvas;
+
+var processModel;
 
 var processPainter;
 var painterSettings = {
@@ -43,6 +41,50 @@ function createActivity(x, y, width, height){
     return a;
 }
 
+function generatePropertiesTable(graphic){
+
+    var html = "";
+    console.log(graphic);
+
+    for(var property in graphic){
+
+        if (typeof graphic[property] !== "function"){
+
+            if (typeof graphic[property] === "object"){
+
+                html = html + "<tr><td colspan='2'>" + property + "</td></tr>";
+
+                obj = graphic[property];
+                console.log(obj);
+
+                for(var objProperty in obj){
+
+                    if(typeof obj[objProperty] !== "function" && typeof obj[objProperty] !== "object"){
+
+                        html = html + "<tr><td>" + objProperty + "</td><td><input id='object_" + property + "_" + objProperty + "' type='text' value='"  + obj[objProperty] + "'></td></tr>";
+                    }
+                }
+
+                html = html + "<tr><td colspan='2'>&nbsp;</td></tr>";
+
+            }
+            else{
+                html = html + "<tr><td>" + property + "</td><td><input id='object" + property + "' type='text' value='"  + graphic[property] + "'></td></tr>";
+            }
+        }else{
+
+        }
+    }
+
+    $("#propertiesTable").html(html);
+}
+
+function showProperties(graphic){
+
+    generatePropertiesTable(graphic);
+    $("#propiedades").css("visibility", "visible");
+}
+
 function dropCanvas(ev) {
 
     ev.preventDefault();
@@ -58,7 +100,9 @@ function dropCanvas(ev) {
     var canvasy = ev.y- canvas.offsetTop;
 
     var graphic;
-    graphic = processPainter.createGraphic(graphicType, new point(canvasx, canvasy));
+    graphic = processPainter.createGraphic(graphicType, {location: new point(canvasx, canvasy)} );
+    showProperties(graphic);
+
     if(objectType == "activity")
     {
 
@@ -137,14 +181,10 @@ $(document).ready(function(){
     context.fill();
     context.stroke();*/
 
-
-    var s = new shape();
-    s.init(new point(10, 10), 50, 20);
-    console.log(s.height);
-
-    var r = new rectangle();
-    r.init(new point(10, 20), 60, 30);
-    console.log(r.height);
+    $("#getImage").on("click", function(){
+        var img = canvas.toDataURL("image/png");
+        $("#canvasImage").html('<img src="'+img+'"/>');
+    });
 
     $(function() {
         $( document ).tooltip();
@@ -153,37 +193,38 @@ $(document).ready(function(){
     $(document).on("keyup", function(e){
 
         var keyprocessed = false;
+        var graphic = processPainter.getSelectedGraphic();
 
-        if(selectedActivity != null){
+        if(graphic != null){
+
+            if(e.keyCode == 17 || (e.keyCode >= 37 && e.keyCode <=40) ){
+                e.preventDefault();
+            }
 
             //Ctrl
             if(e.keyCode == 17){
 
                 ctrlPressed = false;
-                e.preventDefault();
 
             }else {
 
                 if(e.keyCode == 38){
-                    e.preventDefault();
-                    selectedActivity.moveUp();
+
+                    processPainter.moveSelectedGraphicUp();
                     keyprocessed = true;
                 }else{
 
                     if(e.keyCode == 40){
-                        e.preventDefault();
-                        selectedActivity.moveDown();
+                        processPainter.moveSelectedGraphicDown();
                         keyprocessed = true;
                     }else{
 
                         if(e.keyCode == 37){
-                            e.preventDefault();
-                            selectedActivity.moveLeft();
+                            processPainter.moveSelectedGraphicLeft();
                             keyprocessed = true;
                         }else{
                             if(e.keyCode == 39){
-                                e.preventDefault();
-                                selectedActivity.moveRight();
+                                processPainter.moveSelectedGraphicRight();
                                 keyprocessed = true;
                             }
                         }
@@ -191,58 +232,27 @@ $(document).ready(function(){
                 }
 
             }
-
-
-
         }
 
         if(keyprocessed){
-            //e.preventDefault();
-            console.log("default prevented");
+            showProperties(graphic);
         }
     });
 
     $(document).on("keydown", function(e){
 
-        if(selectedActivity != null){
+        var graphic = processPainter.getSelectedGraphic();
+        if(graphic != null) {
 
-            //Ctrl
-            if(e.keyCode == 17){
-
-                ctrlPressed = true;
+            if (e.keyCode == 17 || (e.keyCode >= 37 && e.keyCode <= 40)) {
                 e.preventDefault();
-
-            }else{
-
-                if(e.keyCode == 38){
-                    e.preventDefault();
-                    //selectedActivity.moveUp();
-                    keyprocessed = true;
-                }else{
-
-                    if(e.keyCode == 40){
-                        e.preventDefault();
-                        //selectedActivity.moveDown();
-                        keyprocessed = true;
-                    }else{
-
-                        if(e.keyCode == 37){
-                            e.preventDefault();
-                            //selectedActivity.moveLeft();
-                            keyprocessed = true;
-                        }else{
-                            if(e.keyCode == 39){
-                                e.preventDefault();
-                                //selectedActivity.moveRight();
-                                keyprocessed = true;
-                            }
-                        }
-                    }
-                }
             }
 
-
+            if(e.keyCode == 17){
+                ctrlPressed = true;
+            }
         }
+
     });
 
     $("#saveProperties").on("click", function(){
@@ -276,9 +286,14 @@ $(document).ready(function(){
 
     $('#workAreaCanvas').mousemove(function(e) {
 
-        if(selectedActivity != null){
+        var graphic = processPainter.getSelectedGraphic();
 
-            if(selectedActivity.insideMe(e.pageX - this.offsetLeft, e.pageY - this.offsetTop) || buttonPressed){
+        if(graphic != null){
+
+            x = e.pageX - this.offsetLeft;
+            y = e.pageY - this.offsetTop;
+
+            if(graphic.pointInMyArea(new point(x, y)) || buttonPressed){
                 $('#workAreaCanvas').css('cursor', 'move');
             }else{
                 $('#workAreaCanvas').css('cursor', 'default');
@@ -291,14 +306,15 @@ $(document).ready(function(){
 
         buttonPressed = false;
 
-        if( Math.abs(mouseX- (e.pageX - this.offsetLeft)) >= 3 ||
-            Math.abs(mouseY- (e.pageY - this.offsetTop)) >= 3){
+        if( Math.abs(mouseX - (e.pageX - this.offsetLeft)) >= 3 ||
+            Math.abs(mouseY - (e.pageY - this.offsetTop)) >= 3){
 
-            if(selectedActivity != null){
-                selectedActivity.move(e.pageX - this.offsetLeft - 70, e.pageY - this.offsetTop - 30);
+            if(processPainter.getSelectedGraphic() != null){
+                processPainter.moveSelectedGraphicTo(new point(e.pageX - this.offsetLeft, e.pageY - this.offsetTop));
             }
         }
     });
+
 
     $('#workAreaCanvas').mousedown(function(e) {
 
@@ -308,39 +324,34 @@ $(document).ready(function(){
         mouseX = e.pageX - this.offsetLeft;
         mouseY = e.pageY - this.offsetTop;
 
-        var graphic = processPainter.getGraphicAtLocation(new point(e.pageX - this.offsetLeft, e.pageY - this.offsetTop));
+        var graphic = processPainter.getGraphicAtLocation(new point(mouseX, mouseY));
+        var selGraphic = processPainter.getSelectedGraphic();
+
         if(graphic != null){
 
-            var html = "";
-            console.log(graphic);
+            if(ctrlPressed && selGraphic != null){
 
-            for(var property in graphic){
+                processPainter.createGraphic("connector", { source: selGraphic, destination: graphic });
 
-                console.log(typeof graphic[property]);
-                if (typeof graphic[property] !== "function"){
+            }else{
 
-                    if (typeof graphic[property] === "object"){
+                $('#workAreaCanvas').css('cursor', 'move');
 
-                        console.log(property + " is object");
-                    }
-                    else{
-
-                        console.log(property + " is attribute");
-                        html = html + "<tr><td>" + property + "</td><td><input id='object" + property + "' type='text' value='"  + graphic[property] + "'></td></tr>";
-                    }
-                }else{
-                    console.log(property + " is function");
+                if(selGraphic != null) {
+                    processPainter.unselectGraphic();
                 }
+
+                processPainter.selectGraphic(graphic);
+                showProperties(graphic);
             }
 
-            console.log(html);
-            $("#propertiesTable").html(html);
-            $("#propiedades").css("visibility", "visible");
-
-            processPainter.selectGraphic(graphic);
-
         }else{
-            $("#propiedades").css("visibility", "hidden");
+
+            if(selGraphic != null){
+
+                processPainter.unselectGraphic();
+                $("#propiedades").css("visibility", "hidden");
+            }
         }
 
     });
