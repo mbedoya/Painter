@@ -63,6 +63,11 @@ table td{
     width: 120px;
 }
 
+
+#propiedades img{
+    margin-top: 15px;
+}
+
 #toolbox {
     vertical-align: middle;
 }

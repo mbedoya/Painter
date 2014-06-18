@@ -246,7 +246,32 @@ $(document).ready(function(){
     });
 
     $("#saveProperties").on("click", function(){
-       selectedActivity.setName($("#objectName").val());
+
+        graphic = processPainter.getSelectedGraphic();
+
+        for(var property in graphic){
+
+            if (typeof graphic[property] !== "function"){
+
+                if (typeof graphic[property] === "object"){
+
+                }
+                else{
+
+                    if (typeof graphic[property] === "number"){
+                        graphic[property] = Number( $("#object" + property).val());
+                    }
+                    else{
+                        graphic[property] = $("#object" + property).val();
+                    }
+
+                }
+            }else{
+
+            }
+        }
+
+        processPainter.paint();
     });
 
     $('#workAreaCanvas').mousemove(function(e) {
@@ -283,52 +308,38 @@ $(document).ready(function(){
         mouseX = e.pageX - this.offsetLeft;
         mouseY = e.pageY - this.offsetTop;
 
-        var activity = processModel.getSelectedActivity(e.pageX - this.offsetLeft, e.pageY - this.offsetTop);
-        if(activity != null){
+        var graphic = processPainter.getGraphicAtLocation(new point(e.pageX - this.offsetLeft, e.pageY - this.offsetTop));
+        if(graphic != null){
 
-            $('#workAreaCanvas').css('cursor', 'move');
+            var html = "";
+            console.log(graphic);
 
-            if (selectedActivity == null){
+            for(var property in graphic){
 
-                selectedActivity  = activity;
-                selectedActivity.select();
+                console.log(typeof graphic[property]);
+                if (typeof graphic[property] !== "function"){
 
-            }else{
+                    if (typeof graphic[property] === "object"){
 
-                if(selectedActivity != activity){
-
-                    //Link Activities
-                    if(ctrlPressed){
-
-                        selectedActivity.linkTo(activity);
-                        linked = true;
-
-                    }else{
-
-                        selectedActivity.unselect();
-                        selectedActivity  = activity;
-                        selectedActivity.select();
+                        console.log(property + " is object");
                     }
+                    else{
 
+                        console.log(property + " is attribute");
+                        html = html + "<tr><td>" + property + "</td><td><input id='object" + property + "' type='text' value='"  + graphic[property] + "'></td></tr>";
+                    }
+                }else{
+                    console.log(property + " is function");
                 }
             }
 
-            if(!linked){
+            console.log(html);
+            $("#propertiesTable").html(html);
+            $("#propiedades").css("visibility", "visible");
 
-                $("#propiedades").css("visibility", "visible");
-                $("#objectName").val(selectedActivity.getName());
-            }
-
+            processPainter.selectGraphic(graphic);
 
         }else{
-
-            $('#workAreaCanvas').css('cursor', 'default');
-
-            if(selectedActivity != null){
-                selectedActivity.unselect();
-                selectedActivity = null;
-            }
-
             $("#propiedades").css("visibility", "hidden");
         }
 

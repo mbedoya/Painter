@@ -8,6 +8,7 @@ var painter = function(settings, context, canvas){
     this.canvas = canvas;
     this.settings = settings;
     this.graphics = [];
+    var selectedGraphic = null;
 
     this.createGraphic = function(name, location){
 
@@ -46,5 +47,32 @@ var painter = function(settings, context, canvas){
             console.log("painting in:" + this.graphics[i].location.x);
             this.graphics[i].paint();
         }
+    }
+
+    this.getGraphicAtLocation = function(location){
+
+        var i;
+        var graphic = null;
+        for(i=0;i<this.graphics.length;i++){
+
+            if(location.x >= this.graphics[i].location.x && location.x <= this.graphics[i].location.x + this.graphics[i].width &&
+                location.y >= this.graphics[i].location.y && location.y <= this.graphics[i].location.y + this.graphics[i].height){
+
+                graphic = this.graphics[i];
+                console.log("Graphic found");
+
+                break;
+            }
+        }
+
+        return graphic;
+    }
+
+    this.selectGraphic = function(graphic){
+        selectedGraphic = graphic;
+    }
+
+    this.getSelectedGraphic = function(){
+        return selectedGraphic;
     }
 }
