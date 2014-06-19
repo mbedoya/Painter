@@ -20,6 +20,10 @@ var rectangle = function(){
         }
         roundRect(context, this.location.x, this.location.y, this.width, this.height, 10, true, true);
 
+        context.fillStyle = "#768A8A";
+        context.font = 'italic 13px Helvetica';
+        context.fillText("Actividad", this.location.x + this.width/4, this.location.y + this.height/2.5);
+
     }
 
     this.getConnectionStartPoint = function(){

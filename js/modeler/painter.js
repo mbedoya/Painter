@@ -34,6 +34,15 @@ var painter = function(settings, context, canvas){
                     this.connections.push(graphic);
                 }else{
 
+                    if(name == "diamond"){
+
+                        graphic = new diamond();
+                        graphic.init(opts.location, this.settings.diamond.width, this.settings.diamond.height);
+
+                    }else{
+
+                    }
+
                 }
             }
         }

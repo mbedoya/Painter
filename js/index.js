@@ -20,6 +20,10 @@ var painterSettings = {
         width: 145,
         height: 65
     },
+    diamond: {
+        width: 62,
+        height: 66
+    },
     circle: {
         radius: 30
     }
@@ -108,30 +112,6 @@ function dropCanvas(ev) {
 
     }
 /*
-    if(data == "imgActivity"){
-        act = createActivity(ev.x - canvas.offsetLeft-70, ev.y- canvas.offsetTop-30, 145, 65);
-        if(selectedActivity != null){
-            selectedActivity.unselect();
-        }
-        selectedActivity = act;
-        selectedActivity.select();
-
-        $("#propiedades").css("visibility", "visible");
-        $("#objectName").val("");
-        $("#objectName").focus();
-    }else{
-
-        if(data == "imgStartEvent"){
-
-            context.beginPath();
-            context.arc(ev.x - canvas.offsetLeft-15, ev.y- canvas.offsetTop-15, 30, 0, 2 * Math.PI, false);
-            context.fillStyle = "rgba(255, 255, 0, .5)";
-            context.fill();
-            context.lineWidth = 1;
-            context.strokeStyle = "rgb(255, 0, 0)";
-            context.stroke();
-
-        }else{
 
             context.fillStyle = "rgba(255, 255, 0, .5)";
             context.strokeStyle = "rgb(255, 0, 0)";
@@ -143,7 +123,6 @@ function dropCanvas(ev) {
             context.arc(ev.x - canvas.offsetLeft-15, ev.y- canvas.offsetTop-15, 25, 0, 2 * Math.PI, false);
             context.fill();
             context.stroke();
-        }
 
     }*/
 
@@ -182,14 +161,20 @@ $(document).ready(function(){
 
     $("#propiedades").css("visibility", "hidden");
 
+    var x=100;
+    var y=100;
+    var w=62;
+    var h=66;
+
     /*context.fillStyle = "rgba(255, 255, 0, .5)";
     context.strokeStyle = "rgb(255, 0, 0)";
-    context.lineWidth = 2;
+    context.lineWidth = 1;
     context.beginPath();
-    context.arc(100, 100, 30, 0, 2 * Math.PI, false);
-    context.fill();
-    context.stroke();
-    context.arc(100, 100, 25, 0, 2 * Math.PI, false);
+    context.moveTo(x-w/2, y);
+    context.lineTo(x, y-h/2);
+    context.lineTo(x+w/2,y);
+    context.lineTo(x,y+h/2);
+    context.lineTo(x-w/2, y);
     context.fill();
     context.stroke();*/
 

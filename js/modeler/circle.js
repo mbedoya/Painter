@@ -26,6 +26,10 @@ var circle = function(){
         context.lineWidth = 1;
         context.strokeStyle = "rgb(255, 0, 0)";
         context.stroke();
+
+        context.fillStyle = "#768A8A";
+        context.font = 'italic 13px Helvetica';
+        context.fillText("Inicio", this.location.x-15, this.location.y - this.radius - 10);
     }
 
     this.getConnectionStartPoint = function(){
