@@ -29,11 +29,11 @@ var circle = function(){
     }
 
     this.getConnectionStartPoint = function(){
-        return new point(this.location.x + this.location.radius, this.location.y);
+        return new point(this.location.x + this.radius, this.location.y);
     }
 
     this.getConnectionEndPoint = function(){
-        return new point(this.location.x - this.location.radius, this.location.y);
+        return new point(this.location.x - this.radius, this.location.y);
     }
 
     this.pointInMyArea = function(location){
