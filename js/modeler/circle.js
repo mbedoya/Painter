@@ -15,19 +15,19 @@ var circle = function(){
     this.paint = function(){
 
         if(this.selected){
-            context.fillStyle = "rgba(255, 140, 0, .5)";
+            context.fillStyle = painterSettings.colors.selectedFillStyle;
         }else{
-            context.fillStyle = "rgba(255, 255, 0, .5)";
+            context.fillStyle = painterSettings.colors.fillStyle;
         }
 
         context.beginPath();
         context.arc(this.location.x, this.location.y, this.radius, 0, 2 * Math.PI, false);
         context.fill();
         context.lineWidth = 1;
-        context.strokeStyle = "rgb(255, 0, 0)";
+        context.strokeStyle = painterSettings.colors.strokeStyle;
         context.stroke();
 
-        context.fillStyle = "#768A8A";
+        context.fillStyle = painterSettings.colors.textFillStyle;
         context.font = 'italic 13px Helvetica';
         context.fillText("Inicio", this.location.x-15, this.location.y - this.radius - 10);
     }

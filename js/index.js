@@ -2,7 +2,6 @@
  * Created by USUARIO on 14/06/2014.
  */
 
-var lineStarted = false;
 var mouseX;
 var mouseY;
 
@@ -12,9 +11,9 @@ var ctrlPressed = false;
 var context;
 var canvas;
 
-var processModel;
-
+var processModeler;
 var processPainter;
+
 var painterSettings = {
     rectangle: {
         width: 145,
@@ -26,120 +25,45 @@ var painterSettings = {
     },
     circle: {
         radius: 30
+    },
+    colors: {
+        fillStyle: "rgba(255, 255, 0, .5)",
+        strokeStyle: "rgb(255, 0, 0)",
+        selectedFillStyle: "rgba(255, 140, 0, .5)",
+        textFillStyle: "#768A8A"
     }
-}
-
-function drop(ev) {
-    ev.preventDefault();
-    var data = ev.dataTransfer.getData("Text");
-    //ev.target.appendChild(document.getElementById(data));
-    console.log('Mi drop: ' + data);
-}
-
-function createActivity(x, y, width, height){
-
-    var a = new activity_js(x, y, width, height);
-    a.paint();
-    processModel.addActivity(a);
-
-    return a;
-}
-
-function generatePropertiesTable(graphic){
-
-    var html = "";
-    console.log(graphic);
-
-    for(var property in graphic){
-
-        if (typeof graphic[property] !== "function"){
-
-            if (typeof graphic[property] === "object"){
-
-                html = html + "<tr><td colspan='2'>" + property + "</td></tr>";
-
-                obj = graphic[property];
-                console.log(obj);
-
-                for(var objProperty in obj){
-
-                    if(typeof obj[objProperty] !== "function" && typeof obj[objProperty] !== "object"){
-
-                        html = html + "<tr><td>" + objProperty + "</td><td><input id='object_" + property + "_" + objProperty + "' type='text' value='"  + obj[objProperty] + "'></td></tr>";
-                    }
-                }
-
-                html = html + "<tr><td colspan='2'>&nbsp;</td></tr>";
-
-            }
-            else{
-                html = html + "<tr><td>" + property + "</td><td><input id='object" + property + "' type='text' value='"  + graphic[property] + "'></td></tr>";
-            }
-        }else{
-
-        }
-    }
-
-    $("#propertiesTable").html(html);
-}
-
-function showProperties(graphic){
-
-    generatePropertiesTable(graphic);
-    $("#propiedades").css("visibility", "visible");
-}
-
-function dropCanvas(ev) {
-
-    ev.preventDefault();
-    var data = ev.dataTransfer.getData("Text");
-   console.log(data);
-
-    var objectType = $("#"+data).attr("objectType");
-    var graphicType = $("#"+data).attr("graphicType");
-
-    console.log('dropCanvas: ' + data + ' ' + graphicType);
-
-    var canvasx = ev.x - canvas.offsetLeft;
-    var canvasy = ev.y- canvas.offsetTop;
-
-    var graphic;
-    graphic = processPainter.createGraphic(graphicType, {location: new point(canvasx, canvasy)} );
-    showProperties(graphic);
-
-    if(objectType == "activity")
-    {
-
-    }
-/*
-
-            context.fillStyle = "rgba(255, 255, 0, .5)";
-            context.strokeStyle = "rgb(255, 0, 0)";
-            context.lineWidth = 2;
-            context.beginPath();
-            context.arc(ev.x - canvas.offsetLeft-15, ev.y- canvas.offsetTop-15, 30, 0, 2 * Math.PI, false);
-            context.fill();
-            context.stroke();
-            context.arc(ev.x - canvas.offsetLeft-15, ev.y- canvas.offsetTop-15, 25, 0, 2 * Math.PI, false);
-            context.fill();
-            context.stroke();
-
-    }*/
-
-
-}
-
-function drag(ev) {
-    ev.dataTransfer.setData("Text", ev.target.id);
-    console.log('Mi drag');
-}
-
-function allowDrop(ev) {
-    ev.preventDefault();
-    console.log('Mi allowdrop');
 }
 
 $(document).ready(function(){
+
+    //SETTING VARIABLES
+
+    canvas = document.getElementById('workAreaCanvas');
+    context = canvas.getContext("2d");
+
+    processPainter = new painter(painterSettings, context, canvas);
+    processModeler = new process_modeler();
+
+    $("#propiedades").css("visibility", "hidden");
+
+    var x=100;
+    var y=100;
+    var w=62;
+    var h=66;
+
+    /*context.fillStyle = "rgba(255, 255, 0, .5)";
+     context.strokeStyle = "rgb(255, 0, 0)";
+     context.lineWidth = 1;
+     context.beginPath();
+     context.moveTo(x-w/2, y);
+     context.lineTo(x, y-h/2);
+     context.lineTo(x+w/2,y);
+     context.lineTo(x,y+h/2);
+     context.lineTo(x-w/2, y);
+     context.fill();
+     context.stroke();*/
+
+    //INITIALIZATION
 
     $( "#dialogObjectsAlreadyConnected" ).dialog({
         autoOpen: false,
@@ -153,39 +77,48 @@ $(document).ready(function(){
         }
     });
 
-    canvas = document.getElementById('workAreaCanvas');
-    context = canvas.getContext("2d");
+    $(function() {
+        $( document ).tooltip();
+    });
 
-    processPainter = new painter(painterSettings, context, canvas);
-    processModel = new processModel_js();
-
-    $("#propiedades").css("visibility", "hidden");
-
-    var x=100;
-    var y=100;
-    var w=62;
-    var h=66;
-
-    /*context.fillStyle = "rgba(255, 255, 0, .5)";
-    context.strokeStyle = "rgb(255, 0, 0)";
-    context.lineWidth = 1;
-    context.beginPath();
-    context.moveTo(x-w/2, y);
-    context.lineTo(x, y-h/2);
-    context.lineTo(x+w/2,y);
-    context.lineTo(x,y+h/2);
-    context.lineTo(x-w/2, y);
-    context.fill();
-    context.stroke();*/
+    // BUTTON CLICKS
 
     $("#getImage").on("click", function(){
         var img = canvas.toDataURL("image/png");
         $("#canvasImage").html('<img src="'+img+'"/>');
     });
 
-    $(function() {
-        $( document ).tooltip();
+    $("#saveProperties").on("click", function(){
+
+        graphic = processPainter.getSelectedGraphic();
+
+        for(var property in graphic){
+
+            if (typeof graphic[property] !== "function"){
+
+                if (typeof graphic[property] === "object"){
+
+                }
+                else{
+
+                    if (typeof graphic[property] === "number"){
+                        graphic[property] = Number( $("#object" + property).val());
+                    }
+                    else{
+                        graphic[property] = $("#object" + property).val();
+                    }
+
+                }
+            }else{
+
+            }
+        }
+
+        processPainter.paint();
     });
+
+
+    //KEY PRESSED UP
 
     $(document).on("keyup", function(e){
 
@@ -236,6 +169,9 @@ $(document).ready(function(){
         }
     });
 
+
+    //KEY PRESSED DOWN
+
     $(document).on("keydown", function(e){
 
         var graphic = processPainter.getSelectedGraphic();
@@ -252,34 +188,8 @@ $(document).ready(function(){
 
     });
 
-    $("#saveProperties").on("click", function(){
 
-        graphic = processPainter.getSelectedGraphic();
-
-        for(var property in graphic){
-
-            if (typeof graphic[property] !== "function"){
-
-                if (typeof graphic[property] === "object"){
-
-                }
-                else{
-
-                    if (typeof graphic[property] === "number"){
-                        graphic[property] = Number( $("#object" + property).val());
-                    }
-                    else{
-                        graphic[property] = $("#object" + property).val();
-                    }
-
-                }
-            }else{
-
-            }
-        }
-
-        processPainter.paint();
-    });
+    //MOUSE MOVING
 
     $('#workAreaCanvas').mousemove(function(e) {
 
@@ -299,6 +209,9 @@ $(document).ready(function(){
 
     });
 
+
+    //MOUSE BUTTON PRESSED UP
+
     $('#workAreaCanvas').mouseup(function(e) {
 
         buttonPressed = false;
@@ -314,7 +227,11 @@ $(document).ready(function(){
     });
 
 
+    //MOUSE BUTTON PRESSED DOWN
+
     $('#workAreaCanvas').mousedown(function(e) {
+
+        e.preventDefault();
 
         buttonPressed = true;
         var linked = false;
@@ -325,32 +242,46 @@ $(document).ready(function(){
         var graphic = processPainter.getGraphicAtLocation(new point(mouseX, mouseY));
         var selGraphic = processPainter.getSelectedGraphic();
 
+        //Graphic selected?
         if(graphic != null){
 
+            //Making a connection?
             if(ctrlPressed && selGraphic != null){
 
                 //Connection done already?
-                if(processPainter.checkExistingConnection(graphic, selGraphic)){
-                    $( "#dialogObjectsAlreadyConnected" ).dialog( "open" );
+                if(processPainter.getDirectConnector(selGraphic, graphic)){
+
+                    processPainter.dropConnection(selGraphic, graphic);
+
                 }else{
-                    processPainter.createGraphic("connector", { source: selGraphic, destination: graphic });
+
+                    if(processPainter.getConnector(selGraphic, graphic)){
+                        $( "#dialogObjectsAlreadyConnected" ).dialog( "open" );
+                    }else{
+                        processPainter.createGraphic("connector", { source: selGraphic, destination: graphic });
+                    }
                 }
 
             }else{
 
                 $('#workAreaCanvas').css('cursor', 'move');
 
-                if(selGraphic != null) {
-                    processPainter.unselectGraphic();
-                }
+                if(selGraphic != graphic){
 
-                processPainter.selectGraphic(graphic);
-                showProperties(graphic);
+                    if(selGraphic != null) {
+                        processPainter.unselectGraphic();
+                    }
+
+                    processPainter.selectGraphic(graphic);
+                    showProperties(graphic);
+                }
             }
 
         }else{
 
             if(selGraphic != null){
+
+                console.log("eliminar seleccion")
 
                 processPainter.unselectGraphic();
                 $("#propiedades").css("visibility", "hidden");
@@ -359,6 +290,103 @@ $(document).ready(function(){
 
     });
 
-
-
 });
+
+
+//GENERAL METHODS
+
+function dropCanvas(ev) {
+
+    ev.preventDefault();
+
+    var data = ev.dataTransfer.getData("Text");
+
+    var objectType = $("#"+data).attr("objectType");
+    var graphicType = $("#"+data).attr("graphicType");
+
+    var canvasx = ev.x - canvas.offsetLeft;
+    var canvasy = ev.y- canvas.offsetTop;
+
+
+    var object = processModeler.createObject(objectType);
+    var graphic = processPainter.createGraphic(graphicType, {location: new point(canvasx, canvasy), business_object: object} );
+    showProperties(graphic);
+
+    /*
+
+     context.fillStyle = "rgba(255, 255, 0, .5)";
+     context.strokeStyle = "rgb(255, 0, 0)";
+     context.lineWidth = 2;
+     context.beginPath();
+     context.arc(ev.x - canvas.offsetLeft-15, ev.y- canvas.offsetTop-15, 30, 0, 2 * Math.PI, false);
+     context.fill();
+     context.stroke();
+     context.arc(ev.x - canvas.offsetLeft-15, ev.y- canvas.offsetTop-15, 25, 0, 2 * Math.PI, false);
+     context.fill();
+     context.stroke();
+
+     }*/
+
+}
+
+
+function generatePropertiesTable(graphic){
+
+    var html = "";
+
+    for(var property in graphic){
+
+        if (typeof graphic[property] !== "function"){
+
+            if (typeof graphic[property] === "object"){
+
+                html = html + "<tr><td colspan='2'>" + property + "</td></tr>";
+
+                obj = graphic[property];
+                console.log(obj);
+
+                for(var objProperty in obj){
+
+                    if(typeof obj[objProperty] !== "function" && typeof obj[objProperty] !== "object"){
+
+                        html = html + "<tr><td>" + objProperty + "</td><td><input id='object_" + property + "_" + objProperty + "' type='text' value='"  + obj[objProperty] + "'></td></tr>";
+                    }
+                }
+
+                html = html + "<tr><td colspan='2'>&nbsp;</td></tr>";
+
+            }
+            else{
+                html = html + "<tr><td>" + property + "</td><td><input id='object" + property + "' type='text' value='"  + graphic[property] + "'></td></tr>";
+            }
+        }else{
+
+        }
+    }
+
+    $("#propertiesTable").html(html);
+}
+
+function showProperties(graphic){
+
+    generatePropertiesTable(graphic);
+    $("#propiedades").css("visibility", "visible");
+}
+
+function drop(ev) {
+    ev.preventDefault();
+    var data = ev.dataTransfer.getData("Text");
+    //ev.target.appendChild(document.getElementById(data));
+    console.log('Mi drop: ' + data);
+}
+
+
+function drag(ev) {
+    ev.dataTransfer.setData("Text", ev.target.id);
+    console.log('Mi drag');
+}
+
+function allowDrop(ev) {
+    ev.preventDefault();
+    console.log('Mi allowdrop');
+}

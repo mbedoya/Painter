@@ -18,6 +18,7 @@ var painter = function(settings, context, canvas){
         if(name == "rectangle"){
             graphic = new rectangle();
             graphic.init(opts.location, this.settings.rectangle.width, this.settings.rectangle.height);
+            graphic.business_object = opts.business_object;
             graphic.relocate();
         }else{
 
@@ -135,17 +136,51 @@ var painter = function(settings, context, canvas){
         return graphic;
     }
 
-    this.checkExistingConnection = function(object1, object2){
+    this.getConnector = function(object1, object2){
 
         for (var i = 0; i < this.connections.length; i++) {
             var obj = this.connections[i];
             if( (obj.source == object1 && obj.destination == object2 ) ||
                 (obj.source == object2 && obj.destination == object1 )){
-                return true;
+                return obj;
             }
         }
 
-        return false;
+        return null;
+    }
+
+    this.getDirectConnector = function(object1, object2){
+
+        for (var i = 0; i < this.connections.length; i++) {
+            var obj = this.connections[i];
+            if( obj.source == object1 && obj.destination == object2 ){
+                return obj;
+            }
+        }
+
+        return null;
+    }
+
+    this.dropConnection = function(object1, object2){
+
+        var connectorToDrop = this.getDirectConnector(object1, object2);
+
+        if(connectorToDrop != null){
+
+            //Drop from graphics
+            var index = this.graphics.indexOf(connectorToDrop);
+            if (index > -1) {
+                this.graphics.splice(index, 1);
+            }
+
+            index = this.connections.indexOf(connectorToDrop);
+            if (index > -1) {
+                this.connections.splice(index, 1);
+            }
+
+            this.paint();
+        }
+
     }
 
     this.selectGraphic = function(graphic){
@@ -157,6 +192,8 @@ var painter = function(settings, context, canvas){
     }
 
     this.unselectGraphic = function(){
+
+        console.log("removing selection");
 
         selectedGraphic.selected = false;
         selectedGraphic = null;
