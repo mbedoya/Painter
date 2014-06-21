@@ -9,7 +9,9 @@ var shape = function(){
     this.location;
     this.selected = false;
     var selectable;
-    this.business_object;
+    this.objectType;
+    this.name = "";
+    this.desciption = "";
 
     this.init = function(location, width, height) {
         this.location = location;

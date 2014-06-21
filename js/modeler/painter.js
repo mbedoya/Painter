@@ -18,13 +18,14 @@ var painter = function(settings, context, canvas){
         if(name == "rectangle"){
             graphic = new rectangle();
             graphic.init(opts.location, this.settings.rectangle.width, this.settings.rectangle.height);
-            graphic.business_object = opts.business_object;
+            graphic.objectType = opts.business_object;
             graphic.relocate();
         }else{
 
             if(name == "circle"){
                 graphic = new circle();
                 graphic.init(opts.location, 0, 0);
+                graphic.objectType = opts.business_object;
                 graphic.radius = this.settings.circle.radius;
                 graphic.relocate();
             }else{
@@ -39,6 +40,7 @@ var painter = function(settings, context, canvas){
 
                         graphic = new diamond();
                         graphic.init(opts.location, this.settings.diamond.width, this.settings.diamond.height);
+                        graphic.objectType = opts.business_object;
 
                     }else{
 

@@ -25,11 +25,8 @@ var connnector = function(){
         var sourceStartPoint = this.source.getConnectionStartPoint();
         var destinationEndPoint = this.destination.getConnectionEndPoint();
 
-        console.log("painting connection");
-        console.log(sourceStartPoint);
-        console.log(destinationEndPoint);
-
-        context.strokeStyle = "rgb(255, 0, 0)";
+        context.strokeStyle = painterSettings.colors.strokeStyle;
+        context.beginPath();
 
         //Destination at top right
         if(sourceStartPoint.x < destinationEndPoint.x){

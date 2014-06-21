@@ -12,18 +12,46 @@ var rectangle = function(){
 
     this.paint = function(){
 
-        context.strokeStyle = "rgb(255, 0, 0)";
+        context.strokeStyle = painterSettings.colors.strokeStyle;
         if(this.selected){
-            context.fillStyle = "rgba(255, 140, 0, .5)";
+            context.fillStyle = painterSettings.colors.selectedFillStyle;
         }else{
-            context.fillStyle = "rgba(255, 255, 0, .5)";
+            context.fillStyle = painterSettings.colors.fillStyle;
         }
         roundRect(context, this.location.x, this.location.y, this.width, this.height, 10, true, true);
 
-        context.fillStyle = "#768A8A";
-        context.font = 'italic 13px Helvetica';
-        context.fillText("Actividad", this.location.x + this.width/4, this.location.y + this.height/2.5);
+        if(this.name && this.name.length > 0){
 
+            context.fillStyle = painterSettings.colors.textFillStyle;
+            context.font = 'italic 13px Helvetica';
+            context.fillText(this.name, this.location.x + this.width/4, this.location.y + this.height/2.5);
+        }
+
+        if(this.desciption && this.desciption.length > 0){
+
+            context.strokeStyle = "#000";
+            context.beginPath();
+            context.moveTo(this.location.x + this.width/2 - 3, this.location.y - 20);
+            context.lineTo(this.location.x + this.width/2 - 8, this.location.y - 20);
+            context.lineTo(this.location.x + this.width/2 - 8, this.location.y - 45);
+            context.lineTo(this.location.x + this.width/2 - 3, this.location.y - 45);
+            context.stroke();
+
+            context.fillStyle = painterSettings.colors.textFillStyle;
+            context.font = 'italic 13px Helvetica';
+            context.fillText(this.desciption, this.location.x + this.width/2, this.location.y-30);
+
+            context.strokeStyle = "#000";
+            var lineDash = context.getLineDash();
+            context.beginPath();
+            context.setLineDash([1,2]);
+            context.moveTo(this.location.x + this.width/2 + 10, this.location.y-1);
+            context.lineTo(this.location.x + this.width/2 + 10, this.location.y-20);
+            context.stroke();
+
+            context.setLineDash(lineDash);
+
+        }
     }
 
     this.getConnectionStartPoint = function(){

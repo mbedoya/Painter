@@ -11,7 +11,6 @@ var ctrlPressed = false;
 var context;
 var canvas;
 
-var processModeler;
 var processPainter;
 
 var painterSettings = {
@@ -42,7 +41,6 @@ $(document).ready(function(){
     context = canvas.getContext("2d");
 
     processPainter = new painter(painterSettings, context, canvas);
-    processModeler = new process_modeler();
 
     $("#propiedades").css("visibility", "hidden");
 
@@ -92,20 +90,51 @@ $(document).ready(function(){
 
         graphic = processPainter.getSelectedGraphic();
 
+        console.log(graphic);
+
         for(var property in graphic){
 
             if (typeof graphic[property] !== "function"){
 
                 if (typeof graphic[property] === "object"){
 
+                    obj = graphic[property];
+
+                    for(var objProperty in obj){
+
+                        if (typeof obj[objProperty] !== "function"){
+
+                            if (typeof obj[objProperty] === "object"){
+
+                            }
+                            else{
+
+                                if (typeof obj[objProperty] === "number"){
+
+                                    console.log("getting number " + objProperty);
+
+                                    console.log(obj[objProperty]);
+                                    obj[objProperty] = Number( $("#object_" + property + "_" + objProperty).val());
+                                    console.log(obj[objProperty]);
+                                }
+                                else{
+                                    obj[objProperty] = $("#object_" + property + "_" + objProperty).val();
+                                }
+
+                            }
+                        }else{
+
+                        }
+                    }
+
                 }
                 else{
 
                     if (typeof graphic[property] === "number"){
-                        graphic[property] = Number( $("#object" + property).val());
+                        graphic[property] = Number( $("#object_" + property).val());
                     }
                     else{
-                        graphic[property] = $("#object" + property).val();
+                        graphic[property] = $("#object_" + property).val();
                     }
 
                 }
@@ -113,6 +142,8 @@ $(document).ready(function(){
 
             }
         }
+
+        console.log(graphic);
 
         processPainter.paint();
     });
@@ -307,9 +338,7 @@ function dropCanvas(ev) {
     var canvasx = ev.x - canvas.offsetLeft;
     var canvasy = ev.y- canvas.offsetTop;
 
-
-    var object = processModeler.createObject(objectType);
-    var graphic = processPainter.createGraphic(graphicType, {location: new point(canvasx, canvasy), business_object: object} );
+    var graphic = processPainter.createGraphic(graphicType, {location: new point(canvasx, canvasy), business_object: objectType} );
     showProperties(graphic);
 
     /*
@@ -343,7 +372,6 @@ function generatePropertiesTable(graphic){
                 html = html + "<tr><td colspan='2'>" + property + "</td></tr>";
 
                 obj = graphic[property];
-                console.log(obj);
 
                 for(var objProperty in obj){
 
@@ -357,7 +385,7 @@ function generatePropertiesTable(graphic){
 
             }
             else{
-                html = html + "<tr><td>" + property + "</td><td><input id='object" + property + "' type='text' value='"  + graphic[property] + "'></td></tr>";
+                html = html + "<tr><td>" + property + "</td><td><input id='object_" + property + "' type='text' value='"  + graphic[property] + "'></td></tr>";
             }
         }else{
 
@@ -388,5 +416,4 @@ function drag(ev) {
 
 function allowDrop(ev) {
     ev.preventDefault();
-    console.log('Mi allowdrop');
 }

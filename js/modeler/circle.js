@@ -27,9 +27,36 @@ var circle = function(){
         context.strokeStyle = painterSettings.colors.strokeStyle;
         context.stroke();
 
-        context.fillStyle = painterSettings.colors.textFillStyle;
-        context.font = 'italic 13px Helvetica';
-        context.fillText("Inicio", this.location.x-15, this.location.y - this.radius - 10);
+        if(this.name && this.name.length > 0){
+
+            context.fillStyle = painterSettings.colors.textFillStyle;
+            context.font = 'italic 13px Helvetica';
+            context.fillText(this.name, this.location.x - this.radius/2, this.location.y - this.radius - 20);
+        }
+
+        if(this.desciption && this.desciption.length > 0){
+
+            context.strokeStyle = "#000";
+            context.beginPath();
+            context.moveTo(this.location.x - this.radius - 3, this.location.y+this.radius + 20);
+            context.lineTo(this.location.x - this.radius - 8, this.location.y+this.radius + 20);
+            context.lineTo(this.location.x - this.radius - 8, this.location.y+this.radius + 45);
+            context.lineTo(this.location.x - this.radius - 3, this.location.y+this.radius + 45);
+            context.stroke();
+
+            context.fillStyle = painterSettings.colors.textFillStyle;
+            context.font = 'italic 13px Helvetica';
+            context.fillText(this.desciption, this.location.x - this.radius, this.location.y + this.radius +30);
+
+            var lineDash = context.getLineDash();
+            context.beginPath();
+            context.setLineDash([1,2]);
+            context.moveTo(this.location.x + 10, this.location.y+this.radius+1);
+            context.lineTo(this.location.x + 10, this.location.y+this.radius+20);
+            context.stroke();
+
+            context.setLineDash(lineDash);
+        }
     }
 
     this.getConnectionStartPoint = function(){
